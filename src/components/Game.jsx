@@ -21,7 +21,6 @@ import Card from "./Card";
                           "value": "6", 
                           "suit": "HEARTS"
                         }
-              noCardsRemaining - boolean
  *
  *
  * App -> Game -> { Card, Button }
@@ -30,7 +29,6 @@ function Game() {
   const [isLoading, setIsLoading] = useState(true);
   const [deck, setDeck] = useState(null);
   const [cards, setCards] = useState([]);
-  const [noCardsRemaining, setNoCardsRemaining] = useState(false);
 
   useEffect(() => {
     async function getDeck() {
@@ -43,19 +41,14 @@ function Game() {
     getDeck();
   }, []);
 
-  useEffect(() => {
-    if (cards.length > 0 && cards[cards.length - 1].remaining === 0) {
-      alert("No Cards Remaining");
-      setNoCardsRemaining(true);
-    }
-  }, [cards]);
-
   /**Get a card, if no cards remaining don't draw, add to list of cards */
   async function getCard() {
-    if (noCardsRemaining) return;
     const { data } = await axios.get(
       `https://deckofcardsapi.com/api/deck/${deck.deck_id}/draw/?count=1`
     );
+    if (data.remaining === 0) {
+      return alert("No cards remaining!");
+    }
     setCards((prevCards) => [
       ...prevCards,
       { ...data.cards[0], rotation: Math.random() },
